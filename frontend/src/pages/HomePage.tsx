@@ -102,7 +102,7 @@ const HomePage: React.FC = () => {
             "@context": "https://schema.org",
             "@type": "Organization",
             "name": "SAHAL CARD",
-            "description": "Uniting Education, Consulting & Savings for a better future in Somalia",
+            "description": "Save More, Spend Less",
             "url": "https://maandhise.com",
             "logo": "https://maandhise.com/logo.png",
             "contactPoint": {
@@ -167,7 +167,7 @@ const HomePage: React.FC = () => {
                     className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed"
                   >
                     {language === 'en'
-                      ? 'Uniting Education, Consulting & Savings for a better future in Somalia'
+                      ? 'Save More, Spend Less'
                       : 'Waxbarasho, La Taliye & Keydin wada jirka ah si loo helo mustaqbal wanaagsan Soomaaliya'
                     }
                   </motion.p>

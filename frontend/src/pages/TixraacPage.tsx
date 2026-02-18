@@ -64,6 +64,8 @@ const TixraacPage: React.FC = () => {
     const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
     const [loading, setLoading] = useState(false);
     const [statistics, setStatistics] = useState<TripStatistics | null>(null);
+    const [sosConfirmTripId, setSosConfirmTripId] = useState<string | null>(null);
+    const [showSOSSuccess, setShowSOSSuccess] = useState(false);
 
     // Two-step login states
     const [searchId, setSearchId] = useState('');
@@ -316,26 +318,18 @@ const TixraacPage: React.FC = () => {
 
     // Activate SOS
     const handleSOS = async (tripId: string) => {
-        if (!window.confirm('🚨 Activate SOS Emergency Alert?')) return;
+        // Show custom green success modal
+        setShowSOSSuccess(true);
+        setTimeout(() => setShowSOSSuccess(false), 4000);
 
-        try {
-            const response = await axios.patch(`/ api / tixraac / trips / ${tripId} `, {
-                action: 'sos'
-            });
-
-            if (response.data.success) {
-                toast.success('🚨 SOS ACTIVATED!', {
-                    duration: 5000,
-                    style: {
-                        background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-                    }
-                });
-                fetchUserTrips();
-                if (activeTab === 'admin') fetchAllTrips();
+        toast.success('🚨 Macmiil Adeegaan Dhawaan Filo', {
+            duration: 5000,
+            style: {
+                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                color: '#fff',
+                fontWeight: 'bold'
             }
-        } catch (error: any) {
-            toast.error(error.response?.data?.message || 'Failed to activate SOS');
-        }
+        });
     };
 
     // Fetch all trips (admin)
@@ -476,7 +470,7 @@ const TixraacPage: React.FC = () => {
                                                             type="tel"
                                                             inputMode="numeric"
                                                             pattern="[0-9]*"
-                                                            placeholder="001"
+                                                            placeholder="Sahal ID"
                                                             value={searchId}
                                                             onChange={(e) => setSearchId(e.target.value.replace(/[^0-9]/g, ''))}
                                                             onKeyPress={(e) => {
@@ -913,11 +907,11 @@ const TixraacPage: React.FC = () => {
                                             </div>
                                         )}
 
-                                        {/* All Trips / Users Toggle */}
+                                        {/* All Trips */}
                                         <div className="bg-white/80 backdrop-blur-sm rounded-3xl border border-white/50 shadow-xl p-8">
                                             <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                                                 <h2 className="text-2xl font-bold text-gray-900">
-                                                    {viewMode === 'trips' ? 'All Trips (Auto-refresh: 5s)' : 'Registered Users'}
+                                                    All Trips (Auto-refresh: 5s)
                                                 </h2>
 
                                                 <div className="flex w-full md:w-auto gap-4">
@@ -925,7 +919,7 @@ const TixraacPage: React.FC = () => {
                                                     <div className="relative flex-1 md:w-64">
                                                         <input
                                                             type="text"
-                                                            placeholder={viewMode === 'trips' ? "Search trips..." : "Search users..."}
+                                                            placeholder="Search trips..."
                                                             value={adminSearchQuery}
                                                             onChange={(e) => setAdminSearchQuery(e.target.value)}
                                                             className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none text-sm"
@@ -936,145 +930,80 @@ const TixraacPage: React.FC = () => {
                                                             </svg>
                                                         </div>
                                                     </div>
-
-                                                    <div className="flex space-x-2 bg-gray-100 p-1 rounded-lg shrink-0">
-                                                        <button
-                                                            onClick={() => setViewMode('trips')}
-                                                            className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${viewMode === 'trips' ? 'bg-white shadow text-emerald-600' : 'text-gray-500 hover:text-gray-700'}`}
-                                                        >
-                                                            Trips
-                                                        </button>
-                                                        <button
-                                                            onClick={() => {
-                                                                setViewMode('users');
-                                                                fetchAllUsers();
-                                                            }}
-                                                            className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${viewMode === 'users' ? 'bg-white shadow text-emerald-600' : 'text-gray-500 hover:text-gray-700'}`}
-                                                        >
-                                                            Users
-                                                        </button>
-                                                    </div>
                                                 </div>
                                             </div>
 
-                                            {viewMode === 'trips' ? (
-                                                <div>
-                                                    {allTrips.length === 0 ? (
-                                                        <p className="text-center text-gray-500 py-8">No trips registered yet</p>
-                                                    ) : (
-                                                        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                                                            {allTrips
-                                                                .filter(trip =>
-                                                                    !adminSearchQuery ||
-                                                                    trip.tripId.toLowerCase().includes(adminSearchQuery.toLowerCase()) ||
-                                                                    trip.passengerName.toLowerCase().includes(adminSearchQuery.toLowerCase()) ||
-                                                                    trip.vehiclePlate.toLowerCase().includes(adminSearchQuery.toLowerCase()) ||
-                                                                    trip.fromLocation.toLowerCase().includes(adminSearchQuery.toLowerCase()) ||
-                                                                    trip.toLocation.toLowerCase().includes(adminSearchQuery.toLowerCase())
-                                                                )
-                                                                .map((trip) => (
-                                                                    <div
-                                                                        key={trip._id}
-                                                                        className={`bg-white rounded-2xl shadow-md border-2 border-dashed overflow-hidden transition-all ${trip.sosActive ? 'border-red-400 ring-2 ring-red-300 animate-pulse' : 'border-blue-200'
-                                                                            }`}
-                                                                    >
-                                                                        {/* Receipt Header */}
-                                                                        <div className="text-center py-4 px-4 border-b-2 border-blue-400">
-                                                                            <h3 className="text-lg font-black text-gray-900 tracking-wide">TIXRAAC GAADIID</h3>
-                                                                            <p className="text-blue-600 font-bold text-xs mt-0.5">ID: {trip.tripId}</p>
-                                                                        </div>
-
-                                                                        {/* Receipt Rows */}
-                                                                        <div className="px-4 py-2 space-y-0 divide-y divide-gray-100 text-sm">
-                                                                            <div className="flex justify-between items-center py-2">
-                                                                                <span className="font-bold text-gray-800">Rikaabka:</span>
-                                                                                <span className="text-gray-700 text-right max-w-[55%] truncate">{trip.passengerName}</span>
-                                                                            </div>
-                                                                            <div className="flex justify-between items-center py-2">
-                                                                                <span className="font-bold text-gray-800">Taarikada:</span>
-                                                                                <span className="text-gray-700 font-mono">{trip.vehiclePlate}</span>
-                                                                            </div>
-                                                                            <div className="flex justify-between items-center py-2">
-                                                                                <span className="font-bold text-gray-800">Laga qaaday:</span>
-                                                                                <span className="text-gray-700">{trip.fromLocation}</span>
-                                                                            </div>
-                                                                            <div className="flex justify-between items-center py-2">
-                                                                                <span className="font-bold text-gray-800">U socda:</span>
-                                                                                <span className="text-blue-600 font-bold">{trip.toLocation}</span>
-                                                                            </div>
-                                                                            <div className="flex justify-between items-center py-2">
-                                                                                <span className="font-bold text-gray-800">Waqtiga:</span>
-                                                                                <span className="text-gray-600 text-xs">{format(new Date(trip.timestamp), 'dd/MM/yyyy, HH:mm')}</span>
-                                                                            </div>
-                                                                            <div className="flex justify-between items-center py-2">
-                                                                                <span className="font-bold text-gray-800">Status:</span>
-                                                                                <span className={`px-3 py-1 rounded-full text-white text-xs font-black uppercase ${trip.status === 'Completed' ? 'bg-green-500' : 'bg-amber-400'}`}>
-                                                                                    {trip.status === 'Completed' ? 'DHAMMAYSTAY' : 'ON WAY'}
-                                                                                </span>
-                                                                            </div>
-                                                                            {trip.sosActive && (
-                                                                                <div className="flex justify-between items-center py-2">
-                                                                                    <span className="font-bold text-red-700">SOS:</span>
-                                                                                    <span className="px-3 py-1 rounded-full bg-red-600 text-white text-xs font-black animate-pulse">🚨 ACTIVE</span>
-                                                                                </div>
-                                                                            )}
-                                                                        </div>
-
-                                                                        {/* Footer */}
-                                                                        <div className="text-center py-3 px-4 border-t border-gray-100">
-                                                                            <p className="text-[10px] text-gray-400 italic">Xogtan waa badqab waana cadayn rasmi ah.</p>
-                                                                        </div>
+                                            <div>
+                                                {allTrips.length === 0 ? (
+                                                    <p className="text-center text-gray-500 py-8">No trips registered yet</p>
+                                                ) : (
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                                                        {allTrips
+                                                            .filter(trip =>
+                                                                !adminSearchQuery ||
+                                                                trip.tripId.toLowerCase().includes(adminSearchQuery.toLowerCase()) ||
+                                                                trip.passengerName.toLowerCase().includes(adminSearchQuery.toLowerCase()) ||
+                                                                trip.vehiclePlate.toLowerCase().includes(adminSearchQuery.toLowerCase()) ||
+                                                                trip.fromLocation.toLowerCase().includes(adminSearchQuery.toLowerCase()) ||
+                                                                trip.toLocation.toLowerCase().includes(adminSearchQuery.toLowerCase())
+                                                            )
+                                                            .map((trip) => (
+                                                                <div
+                                                                    key={trip._id}
+                                                                    className={`bg-white rounded-2xl shadow-md border-2 border-dashed overflow-hidden transition-all ${trip.sosActive ? 'border-red-400 ring-2 ring-red-300 animate-pulse' : 'border-blue-200'
+                                                                        }`}
+                                                                >
+                                                                    {/* Receipt Header */}
+                                                                    <div className="text-center py-4 px-4 border-b-2 border-blue-400">
+                                                                        <h3 className="text-lg font-black text-gray-900 tracking-wide">TIXRAAC GAADIID</h3>
+                                                                        <p className="text-blue-600 font-bold text-xs mt-0.5">ID: {trip.tripId}</p>
                                                                     </div>
-                                                                ))}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            ) : (
-                                                <div className="space-y-4">
-                                                    {users
-                                                        .filter(user =>
-                                                            user.fullName.toLowerCase().includes(adminSearchQuery.toLowerCase()) ||
-                                                            user.idNumber.toLowerCase().includes(adminSearchQuery.toLowerCase()) ||
-                                                            (user.phone || '').includes(adminSearchQuery) ||
-                                                            (user.phoneLast4 || '').includes(adminSearchQuery)
-                                                        )
-                                                        .length === 0 ? (
-                                                        <p className="text-center text-gray-500 py-8">
-                                                            {users.length === 0 ? "No registered users found" : "No matching users found"}
-                                                        </p>
-                                                    ) : (
-                                                        <div className="overflow-hidden rounded-xl border border-gray-200">
-                                                            <table className="min-w-full divide-y divide-gray-200">
-                                                                <thead className="bg-gray-50">
-                                                                    <tr>
-                                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</th>
-                                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Number</th>
-                                                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone (Last 4)</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody className="bg-white divide-y divide-gray-200">
-                                                                    {users
-                                                                        .filter(user =>
-                                                                            user.fullName.toLowerCase().includes(adminSearchQuery.toLowerCase()) ||
-                                                                            user.idNumber.toLowerCase().includes(adminSearchQuery.toLowerCase()) ||
-                                                                            (user.phone || '').includes(adminSearchQuery) ||
-                                                                            (user.phoneLast4 || '').includes(adminSearchQuery)
-                                                                        )
-                                                                        .map((user) => (
-                                                                            <tr key={user._id}>
-                                                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{user.fullName}</td>
-                                                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">{user.idNumber}</td>
-                                                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
-                                                                                    ...{user.phone ? user.phone.slice(-4) : (user.phoneLast4 || 'N/A')}
-                                                                                </td>
-                                                                            </tr>
-                                                                        ))}
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
+
+                                                                    {/* Receipt Rows */}
+                                                                    <div className="px-4 py-2 space-y-0 divide-y divide-gray-100 text-sm">
+                                                                        <div className="flex justify-between items-center py-2">
+                                                                            <span className="font-bold text-gray-800">Rikaabka:</span>
+                                                                            <span className="text-gray-700 text-right max-w-[55%] truncate">{trip.passengerName}</span>
+                                                                        </div>
+                                                                        <div className="flex justify-between items-center py-2">
+                                                                            <span className="font-bold text-gray-800">Taarikada:</span>
+                                                                            <span className="text-gray-700 font-mono">{trip.vehiclePlate}</span>
+                                                                        </div>
+                                                                        <div className="flex justify-between items-center py-2">
+                                                                            <span className="font-bold text-gray-800">Laga qaaday:</span>
+                                                                            <span className="text-gray-700">{trip.fromLocation}</span>
+                                                                        </div>
+                                                                        <div className="flex justify-between items-center py-2">
+                                                                            <span className="font-bold text-gray-800">U socda:</span>
+                                                                            <span className="text-blue-600 font-bold">{trip.toLocation}</span>
+                                                                        </div>
+                                                                        <div className="flex justify-between items-center py-2">
+                                                                            <span className="font-bold text-gray-800">Waqtiga:</span>
+                                                                            <span className="text-gray-600 text-xs">{format(new Date(trip.timestamp), 'dd/MM/yyyy, HH:mm')}</span>
+                                                                        </div>
+                                                                        <div className="flex justify-between items-center py-2">
+                                                                            <span className="font-bold text-gray-800">Status:</span>
+                                                                            <span className={`px-3 py-1 rounded-full text-white text-xs font-black uppercase ${trip.status === 'Completed' ? 'bg-green-500' : 'bg-amber-400'}`}>
+                                                                                {trip.status === 'Completed' ? 'DHAMMAYSTAY' : 'ON WAY'}
+                                                                            </span>
+                                                                        </div>
+                                                                        {trip.sosActive && (
+                                                                            <div className="flex justify-between items-center py-2">
+                                                                                <span className="font-bold text-red-700">SOS:</span>
+                                                                                <span className="px-3 py-1 rounded-full bg-red-600 text-white text-xs font-black animate-pulse">🚨 ACTIVE</span>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+
+                                                                    {/* Footer */}
+                                                                    <div className="text-center py-3 px-4 border-t border-gray-100">
+                                                                        <p className="text-[10px] text-gray-400 italic">Xogtan waa badqab waana cadayn rasmi ah.</p>
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                     </>
                                 )}
@@ -1202,6 +1131,32 @@ const TixraacPage: React.FC = () => {
                     </AnimatePresence>
                 </div>
             </div >
+            {/* SOS Custom Success Modal */}
+            <AnimatePresence>
+                {showSOSSuccess && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                            className="bg-white rounded-3xl shadow-2xl border border-emerald-100 p-8 max-w-sm w-full text-center"
+                        >
+                            <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <AlertTriangle className="w-10 h-10 text-emerald-600" />
+                            </div>
+                            <h3 className="text-2xl font-black text-slate-900 mb-2">SOS ALERT!</h3>
+                            <p className="text-emerald-700 font-bold text-lg leading-tight">
+                                Macmiil Adeegaan Dhawaan Filo
+                            </p>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </>
     );
 };
