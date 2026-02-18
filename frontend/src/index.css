@@ -1,0 +1,703 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom breakpoint for extra small screens */
+@media (min-width: 475px) {
+  .xs\:inline {
+    display: inline;
+  }
+  .xs\:hidden {
+    display: none;
+  }
+}
+
+/* Hide scrollbar for mobile navigation */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar { 
+  display: none;  /* Safari and Chrome */
+}
+
+/* Custom animations for toast notifications */
+@keyframes slideInFromRight {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutToRight {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes checkmarkDraw {
+  0% {
+    stroke-dashoffset: 100;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* Logout toast specific animations */
+@keyframes logoutSlideIn {
+  0% {
+    transform: translateX(100%) scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: translateX(-10px) scale(1.1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(0) scale(1.05);
+    opacity: 1;
+  }
+}
+
+@keyframes logoutSlideOut {
+  0% {
+    transform: translateX(0) scale(1.05);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(-20px) scale(0.9);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateX(100%) scale(0.8);
+    opacity: 0;
+  }
+}
+
+@keyframes logoutShimmer {
+  0% {
+    transform: translateX(-100%) skewX(-15deg);
+  }
+  100% {
+    transform: translateX(200%) skewX(-15deg);
+  }
+}
+
+@keyframes logoutBounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0) scale(1.05);
+  }
+  40% {
+    transform: translateY(-10px) scale(1.1);
+  }
+  60% {
+    transform: translateY(-5px) scale(1.08);
+  }
+}
+
+.toast-enter {
+  animation: slideInFromRight 0.3s ease-out;
+}
+
+.toast-exit {
+  animation: slideOutToRight 0.3s ease-in;
+}
+
+.checkmark-animated {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: checkmarkDraw 0.6s ease-in-out forwards;
+}
+
+.shimmer-effect {
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.pulse-effect {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Logout toast specific styles */
+.logout-toast {
+  animation: logoutSlideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.logout-toast::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: logoutShimmer 1.5s ease-in-out;
+}
+
+.logout-toast:hover {
+  animation: logoutBounce 0.6s ease-in-out;
+}
+
+/* Override react-hot-toast animations for logout toast */
+.logout-toast[data-enter] {
+  animation: logoutSlideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.logout-toast[data-exit] {
+  animation: logoutSlideOut 0.4s ease-in;
+}
+
+/* Custom CSS Variables */
+:root {
+  --primary-50: #eff6ff;
+  --primary-100: #dbeafe;
+  --primary-200: #bfdbfe;
+  --primary-300: #93c5fd;
+  --primary-400: #60a5fa;
+  --primary-500: #3b82f6;
+  --primary-600: #2563eb;
+  --primary-700: #1d4ed8;
+  --primary-800: #1e40af;
+  --primary-900: #1e3a8a;
+  
+  --accent-cyan: #06b6d4;
+  --accent-indigo: #6366f1;
+  --accent-sky: #0ea5e9;
+  
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+/* Base Styles */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch; /* Enable momentum scrolling on iOS */
+  /* Prevent any fixed positioning issues */
+  overflow-x: hidden;
+}
+
+/* Scroll Snap Styles */
+.scroll-container {
+  scroll-snap-type: y proximity;
+  overflow-y: scroll;
+  height: 100vh;
+  /* Performance optimizations */
+  will-change: scroll-position;
+  transform: translateZ(0); /* Force hardware acceleration */
+}
+
+.scroll-section {
+  scroll-snap-align: start;
+  height: 100vh;
+}
+
+/* Improved scrolling behavior */
+.scroll-container {
+  scroll-padding-top: 0;
+  scroll-padding-bottom: 0;
+  overscroll-behavior: contain;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  min-height: 100vh;
+  /* Performance optimizations */
+  transform: translateZ(0); /* Force hardware acceleration */
+  will-change: auto; /* Let browser optimize */
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #2563eb, #0891b2);
+}
+
+/* Glassmorphism Components */
+@layer components {
+  .glass {
+    @apply bg-white/10 backdrop-blur-lg border border-white/20 shadow-glass;
+  }
+  
+  .glass-card {
+    @apply bg-white/20 backdrop-blur-sm border border-white/30 shadow-lg hover:shadow-xl transition-shadow duration-300;
+    /* Performance optimizations */
+    will-change: box-shadow;
+    /* Prevent overlapping */
+    position: relative;
+    z-index: 1;
+    margin-bottom: 1rem;
+  }
+  
+  .glass-button {
+    @apply bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30 transition-all duration-300;
+  }
+  
+  .gradient-text {
+    @apply bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent;
+  }
+  
+  .gradient-bg {
+    @apply bg-gradient-to-br from-blue-50 via-blue-100 to-indigo-200;
+  }
+  
+  .gradient-button {
+    @apply bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold transition-colors duration-300 shadow-lg hover:shadow-xl;
+  }
+  
+  .floating-card {
+    @apply transition-shadow duration-300 hover:shadow-xl;
+    /* Performance optimizations */
+    will-change: box-shadow;
+    /* Prevent overlapping */
+    position: relative;
+    z-index: 1;
+    margin-bottom: 1rem;
+  }
+  
+  .glow-effect {
+    @apply shadow-glow hover:shadow-glow-lg transition-all duration-300;
+  }
+  
+  .animate-on-scroll {
+    @apply opacity-0 translate-y-8 transition-all duration-700 ease-out;
+  }
+  
+  .animate-on-scroll.visible {
+    @apply opacity-100 translate-y-0;
+  }
+}
+
+/* Custom Animations - Reduced for better performance */
+@layer utilities {
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+  
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+  
+  .animation-delay-600 {
+    animation-delay: 600ms;
+  }
+}
+
+/* Loading Spinner */
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Skeleton Loading */
+.skeleton {
+  @apply animate-pulse bg-gray-200 rounded;
+}
+
+.skeleton-text {
+  @apply h-4 bg-gray-200 rounded animate-pulse;
+}
+
+.skeleton-avatar {
+  @apply w-12 h-12 bg-gray-200 rounded-full animate-pulse;
+}
+
+/* Form Styles */
+.form-input {
+  @apply w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors duration-300 bg-white/50 backdrop-blur-sm;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-gray-700 mb-2;
+}
+
+.form-error {
+  @apply text-red-500 text-sm mt-1;
+}
+
+.form-success {
+  @apply text-green-500 text-sm mt-1;
+}
+
+/* Button Variants */
+.btn-primary {
+  @apply gradient-button px-6 py-3 rounded-xl text-lg font-semibold;
+}
+
+.btn-secondary {
+  @apply border-2 border-blue-500 text-blue-600 hover:bg-blue-500 hover:text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300;
+}
+
+.btn-ghost {
+  @apply text-blue-600 hover:bg-blue-50 px-6 py-3 rounded-xl font-semibold transition-all duration-300;
+}
+
+.btn-glass {
+  @apply glass-button px-6 py-3 rounded-xl font-semibold;
+}
+
+/* Card Styles */
+.card {
+  @apply bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-blue-100;
+}
+
+.card-glass {
+  @apply glass-card rounded-2xl p-6;
+}
+
+.card-floating {
+  @apply card floating-card;
+}
+
+/* Navigation Styles */
+.nav-link {
+  @apply text-gray-600 hover:text-blue-600 font-medium transition-colors duration-300 relative;
+}
+
+.nav-link.active {
+  @apply text-blue-600;
+}
+
+.nav-link.active::after {
+  content: '';
+  @apply absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-blue-600 to-cyan-600;
+}
+
+/* Hero Section Styles */
+.hero-bg {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 50%, #bfdbfe 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(99, 102, 241, 0.1) 0%, transparent 50%);
+  /* Disabled gradient animation for better performance */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hero-bg {
+    padding: 2rem 1rem;
+  }
+  
+  .card {
+    @apply p-4;
+  }
+  
+  .btn-primary {
+    @apply px-4 py-2 text-base;
+  }
+  
+  /* Prevent card overlapping on mobile */
+  .glass-card,
+  .floating-card {
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Better grid spacing */
+  .grid {
+    gap: 1.5rem;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  .glass-card,
+  .floating-card {
+    margin-bottom: 2rem;
+  }
+  
+  .grid {
+    gap: 2rem;
+  }
+}
+
+/* Dark Mode Support (Future Enhancement) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --glass-bg: rgba(0, 0, 0, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* Print Styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-only {
+    display: block !important;
+  }
+}
+
+/* Disable all animations for stability - EXCEPT gallery modal */
+*:not(.gallery-modal):not(.gallery-modal *) {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+}
+
+/* Disable hover effects that cause shaking - EXCEPT gallery modal */
+*:not(.gallery-modal):not(.gallery-modal *):hover {
+  transform: none !important;
+  scale: none !important;
+  translate: none !important;
+}
+
+/* Disable Framer Motion animations - EXCEPT gallery modal */
+[data-framer-motion]:not(.gallery-modal):not(.gallery-modal *) {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+}
+
+/* Disable all motion components - EXCEPT gallery modal */
+.motion-div:not(.gallery-modal):not(.gallery-modal *),
+.motion-span:not(.gallery-modal):not(.gallery-modal *),
+.motion-h1:not(.gallery-modal):not(.gallery-modal *),
+.motion-h2:not(.gallery-modal):not(.gallery-modal *),
+.motion-h3:not(.gallery-modal):not(.gallery-modal *),
+.motion-p:not(.gallery-modal):not(.gallery-modal *),
+.motion-button:not(.gallery-modal):not(.gallery-modal *) {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+}
+
+/* Allow gallery modal to have full Framer Motion functionality */
+.gallery-modal,
+.gallery-modal * {
+  animation: revert !important;
+  transition: revert !important;
+  transform: revert !important;
+}
+
+/* Disable all Tailwind animation classes */
+.animate-pulse,
+.animate-bounce,
+.animate-spin,
+.animate-ping,
+.animate-pulse-slow,
+.animate-bounce-slow,
+.animate-fade-in,
+.animate-slide-up,
+.animate-slide-down,
+.animate-scale-in,
+.animate-float,
+.animate-blob,
+.animate-gradient {
+  animation: none !important;
+}
+
+/* Disable all transform classes */
+.hover\:scale-105,
+.hover\:scale-110,
+.hover\:-translate-y-2,
+.hover\:translate-x-1,
+.group-hover\:scale-110,
+.group-hover\:translate-x-1 {
+  transform: none !important;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus Styles */
+.focus-visible {
+  @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+}
+
+/* Selection Styles */
+::selection {
+  background-color: rgba(59, 130, 246, 0.3);
+  color: #1e40af;
+}
+
+::-moz-selection {
+  background-color: rgba(59, 130, 246, 0.3);
+  color: #1e40af;
+}
+
+/* Performance Optimizations */
+/* Optimize heavy elements for better scroll performance */
+.glass-button,
+.gradient-button {
+  will-change: transform, box-shadow;
+  transform: translateZ(0);
+}
+
+/* Disable blob animations for better performance */
+.animate-blob {
+  animation: none !important;
+  transform: none !important;
+}
+
+/* Reduce backdrop blur intensity for better performance */
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+}
+
+.backdrop-blur-lg {
+  backdrop-filter: blur(8px);
+}
+
+/* Optimize scroll performance for sections */
+section[data-snap-section] {
+  will-change: transform;
+  transform: translateZ(0);
+  /* Improve scroll performance */
+  contain: layout style paint;
+  backface-visibility: hidden;
+  /* Enhanced scroll snapping */
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+/* Enhanced scroll snapping */
+.snap-container {
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  overflow-y: auto;
+  height: 100vh;
+}
+
+.snap-section {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  height: 100vh;
+  min-height: 100vh;
+}
+
+/* Optimize scroll container */
+.scroll-container {
+  scroll-snap-type: y proximity;
+  overflow-y: scroll;
+  height: 100vh;
+  /* Performance optimizations */
+  will-change: scroll-position;
+  transform: translateZ(0);
+  /* Improve scroll performance */
+  contain: layout style paint;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Apply scroll snap only to the main container, not the entire page */
+main {
+  scroll-snap-type: y proximity;
+}
+
+/* Footer positioning - ensure it flows naturally at bottom */
+footer {
+  position: static !important;
+  z-index: 1;
+  /* Ensure footer doesn't interfere with scroll snap */
+  scroll-snap-align: none;
+  scroll-snap-stop: normal;
+  /* Prevent any fixed positioning */
+  transform: none !important;
+  top: auto !important;
+  bottom: auto !important;
+  /* Ensure proper spacing */
+  margin-top: 2rem;
+  clear: both;
+}
+
+/* Ensure sections have proper scroll snap behavior */
+section[data-snap-section] {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+/* Prevent footer from becoming fixed or sticky */
+footer * {
+  position: static !important;
+}
+
+/* Ensure body doesn't have any height constraints that affect footer */
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+}

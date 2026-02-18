@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+Allow: /get-sahal-card
+Allow: /about
+Allow: /services
+Allow: /sahal-card
+Allow: /contact
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /login
+Disallow: /register
+Disallow: /admin
+Disallow: /api
+Sitemap: https://maandhise.com/sitemap.xml
+

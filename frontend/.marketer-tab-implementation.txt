@@ -1,0 +1,138 @@
+// Marketers Tab - Full Implementation
+// This goes in the renderTabContent switch case for 'marketers'
+// Replace lines 1490-1502 with this content
+
+return (
+  <motion.div 
+    className="space-y-6"
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5 }}
+  >
+    {/* Header with Add Button */}
+    <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <div className="p-2 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg">
+            <Briefcase className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800">
+              {language === 'en' ? 'Marketers Management' : 'Maamulka Suuq-geeyayaasha'}
+            </h2>
+            <p className="text-gray-600 text-sm">
+              {language === 'en' ? 'Manage all marketers in the system' : 'Maamul dhammaan suuq-geeyayaasha nidaamka'}
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={() => setShowAddMarketerForm(true)}
+          className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg"
+        >
+          <UserPlus className="w-5 h-5" />
+          <span>{language === 'en' ? 'Add Marketer' : 'Ku Dar Suuq-geeye'}</span>
+        </button>
+      </div>
+    </div>
+
+    {/* Search Bar */}
+    <div className="bg-white rounded-2xl shadow-lg p-4 border border-gray-100">
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+        <input
+          type="text"
+          placeholder={language === 'en' ? 'Search marketers by name or phone...' : 'Raadi suuq-geeyayaasha magaca ama telefoonka...'}
+          value={marketerSearchQuery}
+          onChange={(e) => setMarketerSearchQuery(e.target.value)}
+          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+        />
+      </div>
+    </div>
+
+    {/* Marketers Grid */}
+    <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+      {marketers.filter(m => 
+        !marketerSearchQuery || 
+        m.fullName.toLowerCase().includes(marketerSearchQuery.toLowerCase()) ||
+        m.phone.toLowerCase().includes(marketerSearchQuery.toLowerCase())
+      ).length === 0 ? (
+        <div className="text-center py-12">
+          <Briefcase className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+          <h3 className="text-xl font-semibold text-gray-700 mb-2">
+            {language === 'en' ? 'No Marketers Found' : 'Ma Jiraan Suuq-geeyayaal'}
+          </h3>
+          <p className="text-gray-500 mb-4">
+            {language === 'en' 
+              ? 'No marketers have been added yet. Click "Add Marketer" to get started.'
+              : 'Weli ma la dhinin suuq-geeyayaal. Guji "Ku Dar Suuq-geeye" si aad u bilowdo.'
+            }
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {marketers.filter(m => 
+            !marketerSearchQuery || 
+            m.fullName.toLowerCase().includes(marketerSearchQuery.toLowerCase()) ||
+            m.phone.toLowerCase().includes(marketerSearchQuery.toLowerCase())
+          ).map((marketer) => (
+            <div
+              key={marketer._id}
+              className="group relative rounded-2xl shadow-lg hover:shadow-xl border bg-white border-gray-100 hover:border-purple-200 overflow-hidden transition-all"
+            >
+              {/* Header Gradient */}
+              <div className="h-20 bg-gradient-to-r from-purple-500 to-indigo-600" />
+              
+              {/* Profile Picture */}
+              <div className="relative -mt-12 flex justify-center mb-4">
+                {marketer.profilePicUrl ? (
+                  <img
+                    src={marketer.profilePicUrl}
+                    alt={marketer.fullName}
+                    className="w-24 h-24 rounded-full object-cover ring-4 ring-white shadow-lg"
+                  />
+                ) : (
+                  <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center ring-4 ring-white shadow-lg">
+                    <User className="w-12 h-12 text-white" />
+                  </div>
+                )}
+              </div>
+
+              {/* Marketer Info */}
+              <div className="px-6 pb-6 text-center">
+                <h3 className="font-bold text-lg text-gray-900 mb-1">{marketer.fullName}</h3>
+                <p className="text-sm text-gray-600 mb-4">{marketer.phone}</p>
+
+                {/* Stats */}
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div className="bg-green-50 rounded-lg p-3">
+                    <div className="flex items-center justify-center gap-1 mb-1">
+                      <DollarSign className="w-4 h-4 text-green-600" />
+                      <p className="text-xs font-medium text-green-600">
+                        {language === 'en' ? 'Earnings' : 'Dakhliga'}
+                      </p>
+                    </div>
+                    <p className="text-lg font-bold text-green-700">${marketer.totalEarnings.toFixed(2)}</p>
+                  </div>
+                  <div className="bg-blue-50 rounded-lg p-3">
+                    <div className="flex items-center justify-center gap-1 mb-1">
+                      <Users className="w-4 h-4 text-blue-600" />
+                      <p className="text-xs font-medium text-blue-600">
+                        {language === 'en' ? 'Customers' : 'Macaam'}
+                      </p>
+                    </div>
+                    <p className="text-lg font-bold text-blue-700">{marketer.approvedCustomers}</p>
+                  </div>
+                </div>
+
+                <p className="text-xs text-gray-500 mb-3">
+                  {language === 'en' ? 'Joined' : 'Ku biiray'}: {new Date(marketer.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  </motion.div>
+);

@@ -1,0 +1,99 @@
+// MarketersTab Component - Copy this into the renderTabContent switch case for 'marketers'
+
+<motion.div 
+  className="space-y-6"
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.5 }}
+>
+  <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+    <div className="flex items-center justify-between">
+      <div className="flex items-center space-x-3">
+        <div className="p-2 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg">
+          <Briefcase className="w-6 h-6 text-white" />
+        </div>
+        <div>
+          <h2 className="text-2xl font-bold text-gray-800">
+            {language === 'en' ? 'Marketers Management' : 'Maamulka Suuq-geeyayaasha'}
+          </h2>
+          <p className="text-gray-600 text-sm">
+            {language === 'en' ? 'Manage all marketers' : 'Maamul suuq-geeyayaasha'}
+          </p>
+        </div>
+      </div>
+      <button
+        onClick={() => setShowAddMarketerForm(true)}
+        className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg"
+      >
+        <UserPlus className="w-5 h-5" />
+        <span>{language === 'en' ? 'Add Marketer' : 'Ku Dar'}</span>
+      </button>
+    </div>
+  </div>
+
+  <div className="bg-white rounded-2xl shadow-lg p-4">
+    <input
+      type="text"
+      placeholder={language === 'en' ? 'Search...' : 'Raadi...'}
+      value={marketerSearchQuery}
+      onChange={(e) => setMarketerSearchQuery(e.target.value)}
+      className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+    />
+  </div>
+
+  <div className="bg-white rounded-2xl shadow-lg p-6">
+    {marketers.filter(m => 
+      !marketerSearchQuery || 
+      m.fullName.toLowerCase().includes(marketerSearchQuery.toLowerCase()) ||
+      m.phone.includes(marketerSearchQuery)
+    ).length === 0 ? (
+      <div className="text-center py-12">
+        <Briefcase className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+        <h3 className="text-xl font-bold mb-2">{language === 'en' ? 'No Marketers' : 'Wax Ma Jiraan'}</h3>
+        <p className="text-gray-500">{language === 'en' ? 'Click Add Marketer to start' : 'Guji Ku Dar'}</p>
+      </div>
+    ) : (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {marketers.filter(m => 
+          !marketerSearchQuery || 
+          m.fullName.toLowerCase().includes(marketerSearchQuery.toLowerCase()) ||
+          m.phone.includes(marketerSearchQuery)
+        ).map((marketer) => (
+          <div key={marketer._id} className="rounded-2xl shadow-lg border overflow-hidden">
+            <div className="h-20 bg-gradient-to-r from-purple-500 to-indigo-600" />
+            <div className="relative -mt-12 flex justify-center mb-4">
+              {marketer.profilePicUrl ? (
+                <img src={marketer.profilePicUrl} alt={marketer.fullName} className="w-24 h-24 rounded-full ring-4 ring-white" />
+              ) : (
+                <div className="w-24 h-24 bg-purple-500 rounded-full flex items-center justify-center ring-4 ring-white">
+                  <User className="w-12 h-12 text-white" />
+                </div>
+              )}
+            </div>
+            <div className="px-6 pb-6 text-center">
+              <h3 className="font-bold text-lg mb-1">{marketer.fullName}</h3>
+              <p className="text-sm text-gray-600 mb-4">{marketer.phone}</p>
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <div className="bg-green-50 rounded-lg p-3">
+                  <p className="text-xs text-green-600">Earnings</p>
+                  <p className="text-lg font-bold text-green-700">${marketer.totalEarnings.toFixed(2)}</p>
+                </div>
+                <div className="bg-blue-50 rounded-lg p-3">
+                  <p className="text-xs text-blue-600">Customers</p>
+                  <p className="text-lg font-bold text-blue-700">{marketer.approvedCustomers}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => handleDeleteMarketer(marketer)}
+                className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center justify-center gap-2"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span>{language === 'en' ? 'Delete' : 'Tirtir'}</span>
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+</motion.div>
