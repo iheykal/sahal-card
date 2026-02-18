@@ -777,8 +777,7 @@ const TixraacPage: React.FC = () => {
                                                         </div>
                                                         <div className="flex justify-between items-center py-3">
                                                             <span className="font-bold text-gray-800">Status:</span>
-                                                            <span className={`px-4 py-1.5 rounded-full text-white text-xs font-black uppercase tracking-wider ${trip.status === 'Completed' ? 'bg-green-500' : 'bg-amber-400'
-                                                                }`}>
+                                                            <span className={`px-4 py-1.5 rounded-full text-white text-xs font-black uppercase tracking-wider ${trip.status === 'Completed' ? 'bg-green-500' : 'bg-amber-400'}`}>
                                                                 {trip.status === 'Completed' ? 'DHAMMAYSTAY' : 'ON WAY'}
                                                             </span>
                                                         </div>
@@ -1009,8 +1008,7 @@ const TixraacPage: React.FC = () => {
                                                                             </div>
                                                                             <div className="flex justify-between items-center py-2">
                                                                                 <span className="font-bold text-gray-800">Status:</span>
-                                                                                <span className={`px-3 py-1 rounded-full text-white text-xs font-black uppercase ${trip.status === 'Completed' ? 'bg-green-500' : 'bg-amber-400'
-                                                                                    }`}>
+                                                                                <span className={`px-3 py-1 rounded-full text-white text-xs font-black uppercase ${trip.status === 'Completed' ? 'bg-green-500' : 'bg-amber-400'}`}>
                                                                                     {trip.status === 'Completed' ? 'DHAMMAYSTAY' : 'ON WAY'}
                                                                                 </span>
                                                                             </div>

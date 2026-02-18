@@ -14,8 +14,26 @@ exports.loginCitizen = async (req, res) => {
             });
         }
 
-        // Find user by ID number
-        const user = await User.findOne({ idNumber });
+        // Find user by ID number (Handle padding/unpadding like authController)
+        const trimmedId = idNumber.trim();
+        let user = await User.findOne({ idNumber: trimmedId });
+
+        // Try padded to 3 digits (e.g. "1" -> "001")
+        if (!user) {
+            const paddedId = trimmedId.padStart(3, '0');
+            if (paddedId !== trimmedId) {
+                user = await User.findOne({ idNumber: paddedId });
+            }
+        }
+
+        // Try unpadded (e.g. "001" -> "1")
+        if (!user) {
+            const unpaddedId = trimmedId.replace(/^0+/, '');
+            if (unpaddedId !== trimmedId && unpaddedId.length > 0) {
+                user = await User.findOne({ idNumber: unpaddedId });
+            }
+        }
+
         if (!user) {
             return res.status(404).json({
                 success: false,
@@ -65,12 +83,19 @@ exports.createTrip = async (req, res) => {
             });
         }
 
-        // Find user
-        const user = await User.findById(userId);
+        // Find user - Use robust lookup to handle both string and ObjectId _id
+        let user = await User.findOne({ _id: userId });
+
+        // If not found, try raw collection (bypassing Mongoose casting for string _ids)
         if (!user) {
+            user = await User.collection.findOne({ _id: userId });
+        }
+
+        if (!user) {
+            console.error(`[createTrip] Customer not found for userId: ${userId}`);
             return res.status(404).json({
                 success: false,
-                message: 'Customer not found'
+                message: `Customer not found (ID: ${userId})`
             });
         }
 
@@ -127,7 +152,25 @@ exports.getTrips = async (req, res) => {
         }
         // Public search mode (User verification)
         else if (idNumber && phoneLast4) {
-            user = await User.findOne({ idNumber });
+            const trimmedId = idNumber.trim();
+            user = await User.findOne({ idNumber: trimmedId });
+
+            // Try padded to 3 digits
+            if (!user) {
+                const paddedId = trimmedId.padStart(3, '0');
+                if (paddedId !== trimmedId) {
+                    user = await User.findOne({ idNumber: paddedId });
+                }
+            }
+
+            // Try unpadded
+            if (!user) {
+                const unpaddedId = trimmedId.replace(/^0+/, '');
+                if (unpaddedId !== trimmedId && unpaddedId.length > 0) {
+                    user = await User.findOne({ idNumber: unpaddedId });
+                }
+            }
+
             if (!user) {
                 return res.status(404).json({
                     success: false,
@@ -146,7 +189,13 @@ exports.getTrips = async (req, res) => {
         }
         // Authenticated mode
         else if (userId) {
-            user = await User.findById(userId);
+            // Use robust lookup for userId
+            user = await User.findOne({ _id: userId });
+
+            if (!user) {
+                user = await User.collection.findOne({ _id: userId });
+            }
+
             if (!user) {
                 return res.status(404).json({
                     success: false,
