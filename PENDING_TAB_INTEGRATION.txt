@@ -1,0 +1,14 @@
+// INSTRUCTIONS TO MANUALLY INTEGRATE PENDING CUSTOMERS TAB
+// Add these 3 changes to frontend/src/pages/dashboard/DashboardPage.tsx
+
+// 1. ADD IMPORT (after line ~33, after other imports):
+import PendingCustomersTab from './PendingCustomersTab.tsx';
+
+// 2. ADD TAB TO NAVIGATION ARRAY (around line 1616-1620, in the tabs array):
+{ id: 'pending', label: language === 'en' ? 'Pending' : 'Sugitaan', icon: Clock },
+// Add this line AFTER the 'users' tab and BEFORE the 'marketers' tab
+
+// 3. ADD CASE TO SWITCH STATEMENT (around line 1553, after 'case users:'):
+case 'pending':
+  return <PendingCustomersTab />;
+// Add this AFTER 'case users' and BEFORE 'case marketers'
