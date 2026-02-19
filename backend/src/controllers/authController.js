@@ -1073,15 +1073,7 @@ const searchUserById = async (req, res) => {
 
       return res.status(404).json({
         success: false,
-        message: 'User not found. Check DEBUG info below.',
-        debug: {
-          searched: idNumber,
-          trimmed: trimmedId,
-          padded: paddedId,
-          unpadded: unpaddedId,
-          sampleDbIds: sampleIds,
-          dbConnection: dbName
-        }
+        message: 'Macmiilkan ma jiro (User not found)'
       });
     }
 

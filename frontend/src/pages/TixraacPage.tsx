@@ -153,21 +153,8 @@ const TixraacPage: React.FC = () => {
             }
         } catch (error: any) {
             const errorMsg = error.response?.data?.message || 'User not found';
-
-            // Show debug info if available
-            if (error.response?.data?.debug) {
-                console.error('SEARCH DEBUG:', error.response.data.debug);
-                const debugInfo = error.response.data.debug;
-                const sampleIds = debugInfo.sampleDbIds && debugInfo.sampleDbIds.length > 0
-                    ? debugInfo.sampleDbIds.join(', ')
-                    : 'none';
-
-                toast.error(`${errorMsg} (DB Samples: ${sampleIds})`, { duration: 6000 });
-                setSearchError(`${errorMsg} (DB Samples: ${sampleIds})`);
-            } else {
-                setSearchError(errorMsg);
-                toast.error(errorMsg);
-            }
+            setSearchError(errorMsg);
+            toast.error(errorMsg);
         } finally {
             setSearchLoading(false);
         }
@@ -221,7 +208,7 @@ const TixraacPage: React.FC = () => {
     // Admin Login Handler
     const handleAdminLogin = (e: React.FormEvent) => {
         e.preventDefault();
-        if (adminCredentials.id === '001' && adminCredentials.pin === '6774') {
+        if (adminCredentials.id === '001' && adminCredentials.pin === 'maandhise11') {
             setIsAdminAuthenticated(true);
             setAdminError(null);
             toast.success('Admin access granted');
@@ -513,12 +500,24 @@ const TixraacPage: React.FC = () => {
                                                         </div>
                                                         <div>
                                                             <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wide">User Found ✅</span>
-                                                            {/* Name: blurred until 4 digits entered */}
+                                                            {/* Name: blurred until correct 4 digits entered */}
                                                             <p
                                                                 className="text-emerald-900 font-bold text-lg transition-all duration-500"
                                                                 style={{
-                                                                    filter: pin.length === 4 ? 'none' : 'blur(6px)',
-                                                                    userSelect: pin.length === 4 ? 'auto' : 'none'
+                                                                    filter: (pin.length === 4 && (
+                                                                        (() => {
+                                                                            let phone = searchedUser.phone || '';
+                                                                            let last4 = phone.startsWith('+252') ? phone.slice(4) : (phone.startsWith('252') ? phone.slice(3) : phone);
+                                                                            return pin === last4.slice(-4);
+                                                                        })()
+                                                                    )) ? 'none' : 'blur(6px)',
+                                                                    userSelect: (pin.length === 4 && (
+                                                                        (() => {
+                                                                            let phone = searchedUser.phone || '';
+                                                                            let last4 = phone.startsWith('+252') ? phone.slice(4) : (phone.startsWith('252') ? phone.slice(3) : phone);
+                                                                            return pin === last4.slice(-4);
+                                                                        })()
+                                                                    )) ? 'auto' : 'none'
                                                                 }}
                                                             >
                                                                 {searchedUser.fullName}
@@ -526,8 +525,11 @@ const TixraacPage: React.FC = () => {
                                                             <p className="text-emerald-600 text-xs">ID: {searchedUser.idNumber}</p>
                                                         </div>
                                                     </div>
+                                                    {pin.length === 4 && pin !== (searchedUser.phone?.startsWith('+252') ? searchedUser.phone.slice(4) : (searchedUser.phone?.startsWith('252') ? searchedUser.phone.slice(3) : searchedUser.phone))?.slice(-4) && (
+                                                        <p className="text-xs text-red-600 italic">Lambar khaldan (Incorrect digits)</p>
+                                                    )}
                                                     {pin.length < 4 && (
-                                                        <p className="text-xs text-emerald-600 italic">Enter last 4 digits to reveal identity</p>
+                                                        <p className="text-xs text-emerald-600 italic">Gali 4-ta lambar ee u dambeeya number-kaaga</p>
                                                     )}
                                                 </div>
 
