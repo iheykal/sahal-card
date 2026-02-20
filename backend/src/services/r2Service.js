@@ -76,9 +76,8 @@ class R2Service {
     // If the public URL creates a duplicated bucket path (common with some R2 setups), fix it
     // Example: https://pub-xxx.r2.dev/bucketName/bucketName/file.jpg -> https://pub-xxx.r2.dev/bucketName/file.jpg
     if (cleanBase.endsWith(`/${bucketName}`)) {
-      // It already includes the bucket name, so we just append the key
-      // But if the key also starts with the bucket name (rare but possible), we might double up.
-      // For now, standard behavior:
+      // Remove the duplicate bucket name from the base URL since the pub.r2.dev URL maps directly to the bucket root
+      cleanBase = cleanBase.slice(0, -(`/${bucketName}`.length));
     }
 
     return `${cleanBase}/${key}`;
